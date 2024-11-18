@@ -49,12 +49,12 @@ class InterestRateCurve:
     def __init__(self, times, interest_rates):
         self.times = times
         self.interest_rates = interest_rates
-        self.continuous_rates = [rate for rate in self.interest_rates]
+        self.continuous_rates = [r.rate for r in self.interest_rates]
 
         self.curve = interp1d(x=self.times, y=self.continuous_rates, kind="linear", bounds_error=False, fill_value=(self.continuous_rates[0], self.continuous_rates[-1]))
     
     def discount(self, values, times):
-        return np.sum(values*np.exp(-self.curve(times)))
+        return np.sum([value*np.exp(-self.curve(time)*time) for (value, time) in zip(values, times)])
     
 class ZeroRate(InterestRate):
     pass
