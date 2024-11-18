@@ -6,11 +6,11 @@ class InterestRate:
         # save interest rate as continuous
         self.rate = InterestRate.change_interest_frequency(r1=rate, m1=compounding_frequency, m2="continuous")
 
-    def __call__(self, compounding_frequency):
+    def __call__(self, compounding_frequency='continuous'):
         return InterestRate.change_interest_frequency(r1=self.rate, m1="continuous", m2=compounding_frequency)
     
     def discount(self, values, times):
-        return np.sum(values*np.exp(-self.rate*times))
+        return np.sum([value*np.exp(-self.rate*time) for (value, time) in zip(values, times)])
 
     @staticmethod
     def change_interest_frequency(*, r1:float, m1:int|str, m2:int|str)->float:
