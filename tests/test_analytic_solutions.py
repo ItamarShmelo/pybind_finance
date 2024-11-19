@@ -6,44 +6,55 @@ from src.python.interest_rate import InterestRate, ForwardRate, ZeroRate
 from src.python.analytic_solutions.simple_formulas import ForwardRateAgreement
 
 def test_vanilla_call_option_price():
-    vanilla_call_page_392 = BlackScholesVanillaCall(K=900, r=InterestRate(0.08, "continuous"), sigma=0.2, q=InterestRate(0.03, 'continuous'))
+    # page 392
+    option_data_p392 = dict(S=930., K=900., T=2./12., sigma=0.2, r=InterestRate(0.08, "continuous"), q=InterestRate(0.03, 'continuous'))
 
-    S=930.
-    T=2./12.
-    assert np.isclose(vanilla_call_page_392.d_plus(S, T, vanilla_call_page_392.K), 0.5444, atol=1e-4)
-    assert np.isclose(vanilla_call_page_392.d_minus(S, T, vanilla_call_page_392.K), 0.4628, atol=1e-4)
-    assert np.isclose(vanilla_call_page_392.option_price(S, T, vanilla_call_page_392.K), 51.83, atol=1e-2)
+    d_plus = BlackScholesVanillaCall.d_plus(**option_data_p392)
+    d_minus = BlackScholesVanillaCall.d_minus(**option_data_p392)
+    option_price = BlackScholesVanillaCall.option_price(**option_data_p392)
 
-    vanilla_call_page_395 = BlackScholesVanillaCall(K=1.6, r=InterestRate(0.08, "continuous"), sigma=0.2, q=InterestRate(0.11, 'continuous'))
-
-    S=1.6
-    T=0.3333
-    assert np.isclose(vanilla_call_page_395.option_price(S, T), 0.0639, atol=1e-4)
-
-    vanilla_call_page_395.sigma = 0.1
-    assert np.isclose(vanilla_call_page_395.option_price(S, T), 0.0285, atol=1e-4)
-
-    vanilla_call_page_395.sigma = 0.141
-    assert np.isclose(vanilla_call_page_395.option_price(S, T), 0.043, atol=1e-3)
+    assert np.isclose(d_plus, 0.5444, atol=1e-4)
+    assert np.isclose(d_minus, 0.4628, atol=1e-4)
+    assert np.isclose(option_price, 51.83, atol=1e-2)
 
 
-    # comparison with https://www.math.drexel.edu/~pg/fin/VanillaCalculator.html
-    vanilla_call_test_1 = BlackScholesVanillaCall(K=100., r=InterestRate(0.05, "continuous"), sigma=0.2, q=InterestRate(0.0, 'continuous'))
-    
-    S=100.
-    T=1.
-    assert np.isclose(vanilla_call_test_1.option_price(S, T), 10.45058, atol=1e-5)
-    assert np.isclose(vanilla_call_test_1.delta(S, T, vanilla_call_test_1.K), 0.63683, atol=1e-5)
-    assert np.isclose(vanilla_call_test_1.strike_given_delta(S, T, 0.63683, tol=1e-5), 100., atol=1e-5)
+    option_data_p395 = dict(S=1.6, K=1.6, T=0.3333, sigma=0.2, r=InterestRate(0.08, "continuous"), q=InterestRate(0.11, 'continuous'))
+    option_price = BlackScholesVanillaCall.option_price(**option_data_p395)
+    assert np.isclose(option_price, 0.0639, atol=1e-4)
 
-    vanilla_call_test_1.q = InterestRate(0.2, 'continuous')
-    assert np.isclose(vanilla_call_test_1.option_price(S, T), 2.30841, atol=1e-5)
-    assert np.isclose(vanilla_call_test_1.delta(S, T, vanilla_call_test_1.K), 0.21111, atol=1e-5)
-    assert np.isclose(vanilla_call_test_1.strike_given_delta(S, T, 0.21111, tol=1e-5), 100., atol=1e-5)
+    option_data_p395['sigma'] = 0.1
+    option_price = BlackScholesVanillaCall.option_price(**option_data_p395)
+    assert np.isclose(option_price, 0.0285, atol=1e-4)
 
-    S=120.
-    T=0.5
-    assert np.isclose(vanilla_call_test_1.strike_given_delta(S, T, 0.7208065, tol=1e-5), 100., atol=1e-5)
+    option_data_p395['sigma'] = 0.141
+    option_price = BlackScholesVanillaCall.option_price(**option_data_p395)
+    assert np.isclose(option_price, 0.043, atol=1e-3)
+
+
+    # # comparison with https://www.math.drexel.edu/~pg/fin/VanillaCalculator.html
+    option_data_web = dict(S=100., K=100., T=1., sigma=0.2, r=InterestRate(0.05, "continuous"), q=InterestRate(0.0, 'continuous'))
+    option_price = BlackScholesVanillaCall.option_price(**option_data_web)
+    delta = BlackScholesVanillaCall.delta(**option_data_web)
+    strike_given_delta = BlackScholesVanillaCall.strike_given_delta(delta=0.63683, tol=1e-5, **option_data_web)
+    assert np.isclose(option_price, 10.45058, atol=1e-5)
+    assert np.isclose(delta, 0.63683, atol=1e-5)
+    assert np.isclose(strike_given_delta, 100., atol=1e-5)
+
+    option_data_web['q'] = InterestRate(0.2, 'continuous')
+    option_price = BlackScholesVanillaCall.option_price(**option_data_web)
+    delta = BlackScholesVanillaCall.delta(**option_data_web)
+    strike_given_delta = BlackScholesVanillaCall.strike_given_delta(delta=0.21111, tol=1e-5, **option_data_web)
+    assert np.isclose(option_price, 2.30841, atol=1e-5)
+    assert np.isclose(delta, 0.21111, atol=1e-5)
+    assert np.isclose(strike_given_delta, 100., atol=1e-5)
+
+    # S=120.
+    # T=0.5
+    option_data_web['S'] = 120.
+    option_data_web['T'] = 0.5
+    strike_given_delta = BlackScholesVanillaCall.strike_given_delta(delta=0.7208065, tol=1e-5, **option_data_web)
+
+    assert np.isclose(strike_given_delta, 100., atol=1e-5)
 
 def test_forward_rate_agreement():
     fra_p_112 = ForwardRateAgreement(principal=100e6, tstart=1.5, tend=2.0, risk_free_rate=InterestRate(0.04, 'continuous'), fixed_rate=InterestRate(0.058, 2))
