@@ -74,4 +74,4 @@ class Bond:
         f = lambda y: np.sum([c*np.exp(-y*i*dt) for i in range(1, int(m*T)+1)]) + self.principal*np.exp(-y*T) - bond_price
 
         sol = root_scalar(f=f, x0=self.interest_rate.rate)
-        return sol.root
+        return InterestRate(sol.root, 'continuous')

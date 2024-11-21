@@ -45,4 +45,4 @@ def test_calculate_zero_rate_at_time_of_maturity_from_bond_price():
 def test_bond_calculate_yield():
     bond = Bond(principal=100.0, interest_rate=InterestRate(0.08, 1), coupon_frequency=2, time_to_maturity=3.0)
     
-    np.isclose(bond.calculate_bond_yield(bond_price=104.0), 0.06407, atol=1e-5)
+    np.isclose(bond.calculate_bond_yield(bond_price=104.0).rate, 0.06407, atol=1e-5)
