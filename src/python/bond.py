@@ -43,10 +43,8 @@ class Bond:
         
     def calculate_zero_rate_at_time_of_maturity_from_bond_price(self, *, bond_price, zero_rates=None)->float:
         if zero_rates is None:
-            # return yield
-            # bond_yield = self.
-            # return 
-            pass
+            bond_yield = self.calculate_bond_yield(bond_price=bond_price)
+            return ZeroRate(bond_yield.rate, 'continuous')
 
         if not isinstance(zero_rates, ZeroRateCurve):
             zero_rates = ZeroRateCurve(zero_rates[:, 0], zero_rates[:, 1])
