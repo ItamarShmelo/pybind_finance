@@ -36,7 +36,7 @@ class BlackScholesVanillaCall:
         return norm.cdf(d_plus) * np.exp(-q.rate*T)
     
     @staticmethod
-    def strike_given_delta(*, delta, S, T, sigma, r, q, tol=1e-3):
+    def strike_given_delta(*, delta, S, T, sigma, r, q, tol=1e-3, **kwargs):
         f = lambda K: BlackScholesVanillaCall.delta(S=S, K=K, T=T, sigma=sigma, r=r, q=q) - delta
         
         return root_scalar(f, x0=S, xtol=tol).root
