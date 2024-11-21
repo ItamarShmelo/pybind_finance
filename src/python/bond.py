@@ -75,3 +75,16 @@ class Bond:
 
         sol = root_scalar(f=f, x0=self.interest_rate.rate)
         return InterestRate(sol.root, 'continuous')
+
+    def calculate_bond_par_yield(self, *, zero_rates=None):
+        if not isinstance(zero_rates, ZeroRateCurve):
+            zero_rates = ZeroRateCurve(zero_rates[:, 0], zero_rates[:, 1])
+            
+        m = self.coupon_frequency
+        T = self.time_to_maturity
+        dt = 1.0/m if m!= 0 else 0.0
+
+        A = zero_rates.discount(values=[1.0]*int(self.coupon_frequency*self.time_to_maturity), 
+        times=[n*dt for n in range(1, int(m*T)+1)])
+        
+        return m*(self.principal - zero_rates.discount(values=[self.principal], times=[T]))/A
