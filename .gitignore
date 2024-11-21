@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# python staff
+*.pyc
+
+data
+*.log
