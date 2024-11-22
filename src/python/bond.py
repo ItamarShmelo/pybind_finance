@@ -22,7 +22,7 @@ class Bond:
 
     def get_bond_price_from_zero_rates(self, *, zero_rates)->float:
         if not isinstance(zero_rates, ZeroRateCurve):
-            zero_rates = ZeroRateCurve(zero_rates[:, 0], zero_rates[:, 1])
+            zero_rates = ZeroRateCurve(zero_rates)
 
         T = self.time_to_maturity
         m = self.coupon_frequency
@@ -44,10 +44,10 @@ class Bond:
     def calculate_zero_rate_at_time_of_maturity_from_bond_price(self, *, bond_price, zero_rates=None)->float:
         if zero_rates is None:
             bond_yield = self.calculate_bond_yield(bond_price=bond_price)
-            return ZeroRate(bond_yield.rate, 'continuous')
+            return ZeroRate(self.time_to_maturity, bond_yield.rate, 'continuous')
 
         if not isinstance(zero_rates, ZeroRateCurve):
-            zero_rates = ZeroRateCurve(zero_rates[:, 0], zero_rates[:, 1])
+            zero_rates = ZeroRateCurve(zero_rates)
         
         T = self.time_to_maturity
         m = self.coupon_frequency
@@ -61,7 +61,7 @@ class Bond:
 
         sol = root_scalar(f=f, x0=self.interest_rate.rate, xtol=1e-6).root
 
-        return ZeroRate(sol, 'continuous')
+        return ZeroRate(self.time_to_maturity, sol, 'continuous')
 
     def calculate_bond_yield(self, *, bond_price):
         T = self.time_to_maturity
@@ -76,7 +76,7 @@ class Bond:
 
     def calculate_bond_par_yield(self, *, zero_rates=None):
         if not isinstance(zero_rates, ZeroRateCurve):
-            zero_rates = ZeroRateCurve(zero_rates[:, 0], zero_rates[:, 1])
+            zero_rates = ZeroRateCurve(zero_rates)
             
         m = self.coupon_frequency
         T = self.time_to_maturity

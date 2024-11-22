@@ -39,18 +39,18 @@ def test_interest_rates_change_interest_frequency():
 def test_calculate_forward_rate_from_zero_rates():
     # pq 4
     zero_rates_pq_4_4 = np.array([
-        [0.25, ZeroRate(0.03, 'continuous')],
-        [0.50, ZeroRate(0.032, 'continuous')],
-        [0.75, ZeroRate(0.034, 'continuous')],
-        [1.00, ZeroRate(0.035, 'continuous')],
-        [1.25, ZeroRate(0.036, 'continuous')],
-        [1.50, ZeroRate(0.037, 'continuous')],
+        ZeroRate(0.25, 0.030, 'continuous'),
+        ZeroRate(0.50, 0.032, 'continuous'),
+        ZeroRate(0.75, 0.034, 'continuous'),
+        ZeroRate(1.00, 0.035, 'continuous'),
+        ZeroRate(1.25, 0.036, 'continuous'),
+        ZeroRate(1.50, 0.037, 'continuous')
     ])
 
     solution_pq_4 = [0.034, 0.038, 0.038, 0.04, 0.042]
 
     for i in range(1, len(zero_rates_pq_4_4)):
-        t1 = zero_rates_pq_4_4[i-1][0]
-        t2 = zero_rates_pq_4_4[i][0]
+        t1 = zero_rates_pq_4_4[i-1].time
+        t2 = zero_rates_pq_4_4[i].time
         forward_rate = ForwardRate.calculate_forward_rate_from_zero_rates(zero_rates_pq_4_4, t1, t2)
         assert np.isclose(forward_rate(), solution_pq_4[i-1], atol=1e-4)

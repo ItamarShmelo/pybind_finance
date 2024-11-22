@@ -56,11 +56,15 @@ class InterestRateCurve:
     def discount(self, values, times):
         return np.sum([value*np.exp(-self.curve(time)*time) for (value, time) in zip(values, times)])
     
-class ZeroRate(InterestRate): pass
+class ZeroRate(InterestRate): 
+    def __init__(self, time, rate, compounding_frequency):
+        super().__init__(rate, compounding_frequency)
+        self.time = time
 
 class ZeroRateCurve(InterestRateCurve):
-    def __init__(self, times, zero_rates):
+    def __init__(self, zero_rates):
         for rate in zero_rates: assert isinstance(rate, ZeroRate), f"All zero rates must be ZeroRate instances and got {type(rate)} val={rate}"
+        times = [rate.time for rate in zero_rates]
         super().__init__(times, zero_rates)
 
 class ForwardRate(InterestRate):
@@ -73,7 +77,7 @@ class ForwardRate(InterestRate):
     @staticmethod
     def calculate_forward_rate_from_zero_rates(zero_rates, t1, t2, compounding_frequency='continuous'):
         if not isinstance(zero_rates, ZeroRateCurve):
-            zero_rates = ZeroRateCurve(zero_rates[:, 0], zero_rates[:, 1])
+            zero_rates = ZeroRateCurve(zero_rates)
 
         forward_rate = (zero_rates.curve(t2)*t2 - zero_rates.curve(t1)*t1) / (t2- t1)
         return ForwardRate(rate=forward_rate, compounding_frequency=compounding_frequency, t1=t1, t2=t2)
