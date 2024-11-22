@@ -10,6 +10,9 @@ class InterestRate:
     def __call__(self, compounding_frequency='continuous'):
         return InterestRate.change_interest_frequency(r1=self.rate, m1="continuous", m2=compounding_frequency)
     
+    def discount(self, time, value):
+        return value*np.exp(-self.rate*time)
+    
     def discount_cashflow(self, cashflow: CashFlow):
         return np.sum([amount*np.exp(-self.rate*time) for (time, amount) in cashflow])
 

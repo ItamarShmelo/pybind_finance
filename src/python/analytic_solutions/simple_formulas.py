@@ -11,4 +11,4 @@ class ForwardRateAgreement:
     def price(self, forward_rate, compounding_frequency='continuous'):
         dtime = self.tend - self.tstart
 
-        return self.risk_free_rate.discount(values=[dtime*self.principal*(self.fixed_rate(compounding_frequency)-forward_rate(compounding_frequency))], times=[self.tend])
+        return self.risk_free_rate.discount(value=dtime*self.principal*(self.fixed_rate(compounding_frequency)-forward_rate(compounding_frequency)), time=self.tend)
