@@ -54,3 +54,21 @@ def test_calculate_forward_rate_from_zero_rates():
         t2 = zero_rates_pq_4_4[i].time
         forward_rate = ForwardRate.calculate_forward_rate_from_zero_rates(zero_rates_pq_4_4, t1, t2)
         assert np.isclose(forward_rate(), solution_pq_4[i-1], atol=1e-4)
+    
+    # pq 4.13
+    zero_rates_pq_4_13 = np.array([
+        ZeroRate(1.0, 0.020, 'continuous'),
+        ZeroRate(2.0, 0.030, 'continuous'),
+        ZeroRate(3.0, 0.037, 'continuous'),
+        ZeroRate(4.0, 0.042, 'continuous'),
+        ZeroRate(5.0, 0.045, 'continuous')
+    ])
+
+    results_pq_4_13 = [0.04, 0.051, 0.057, 0.057]
+
+    for i in range(1, len(zero_rates_pq_4_13)):
+        t1 = zero_rates_pq_4_13[i-1].time
+        t2 = zero_rates_pq_4_13[i].time
+        forward_rate = ForwardRate.calculate_forward_rate_from_zero_rates(zero_rates_pq_4_13, t1, t2)
+        logger.info(f'Forward rate from t={t1} to t={t2}: {forward_rate():g}')
+        np.isclose(forward_rate(), results_pq_4_13[i-1], atol=1e-4)
