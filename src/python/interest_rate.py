@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.interpolate import interp1d
+from src.python.cashflow import CashFlow
 
 class InterestRate:
     def __init__(self, rate, compounding_frequency):
@@ -9,8 +10,8 @@ class InterestRate:
     def __call__(self, compounding_frequency='continuous'):
         return InterestRate.change_interest_frequency(r1=self.rate, m1="continuous", m2=compounding_frequency)
     
-    def discount(self, values, times):
-        return np.sum([value*np.exp(-self.rate*time) for (value, time) in zip(values, times)])
+    def discount_cashflow(self, cashflow: CashFlow):
+        return np.sum([amount*np.exp(-self.rate*time) for (time, amount) in cashflow])
 
     @staticmethod
     def change_interest_frequency(*, r1:float, m1:int|str, m2:int|str)->float:
@@ -53,8 +54,8 @@ class InterestRateCurve:
 
         self.curve = interp1d(x=self.times, y=self.continuous_rates, kind="linear", bounds_error=False, fill_value=(self.continuous_rates[0], self.continuous_rates[-1]))
     
-    def discount(self, values, times):
-        return np.sum([value*np.exp(-self.curve(time)*time) for (value, time) in zip(values, times)])
+    def discount_cashflow(self, cashflow: CashFlow):
+        return np.sum([amount*np.exp(-self.curve(time)*time) for (time, amount) in cashflow])
     
 class ZeroRate(InterestRate): 
     def __init__(self, time, rate, compounding_frequency):
